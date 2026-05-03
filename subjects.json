@@ -1,0 +1,44 @@
+[
+    {
+        "code": "ESP",
+        "title": "nOBODYKNOWS",
+        "units": 1,
+        "time": "8:00-9:30 AM",
+        "day": "MWF"
+    },
+    {
+        "code": "ISP 301",
+        "title": "Evaluation of Business Performance",
+        "units": 3,
+        "time": "10:00-11:30 AM",
+        "day": "TTH"
+    },
+    {
+        "code": "ISP 302",
+        "title": "Application Development Emerging and Technologies",
+        "units": 3,
+        "time": "1:00-2:30 PM",
+        "day": "MWF"
+    },
+    {
+        "code": "ISP 303",
+        "title": "IS Strategy and Management Acquisition",
+        "units": 3,
+        "time": "3:00-4:30 PM",
+        "day": "TTH"
+    },
+    {
+        "code": "ISP 304",
+        "title": "IS Innovation and New Technologies",
+        "units": 3,
+        "time": "7:00-8:30 AM",
+        "day": "Sat"
+    },
+    {
+        "code": "ABC",
+        "title": "NEW PRDUCT",
+        "units": 3,
+        "time": "8:00-9:30 AM",
+        "day": "MWF"
+    }
+]

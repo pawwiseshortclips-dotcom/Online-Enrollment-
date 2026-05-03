@@ -1,0 +1,115 @@
+/* Basic styling for Enrollment System */
+body{font-family:Arial,Helvetica,sans-serif;background:#f7f9fc;color:#222;margin:0;padding:20px}
+.container{max-width:960px;margin:0 auto;background:#fff;padding:20px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+h2{margin-top:0}
+form label{display:block;margin-top:10px;font-weight:600}
+input[type=text], input[type=email], input[type=password], select{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px}
+input[type=file]{margin-top:6px}
+button{margin-top:12px;padding:10px 14px;background:#2b6cb0;color:#fff;border:none;border-radius:4px;cursor:pointer}
+.error{background:#ffe6e6;padding:8px;border:1px solid #f5c2c2;color:#900}
+.admin-nav{list-style:none;padding:0}
+.admin-nav li{display:inline-block;margin-right:12px}
+.table{width:100%;border-collapse:collapse;margin-top:12px}
+.table th, .table td{padding:8px;border:1px solid #eee;text-align:left}
+.search-form{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.search-form input[type=text]{flex:2}
+.search-form select{flex:1}
+.small{display:inline-block;padding:4px 8px;background:#eee;border-radius:4px;margin-right:4px;text-decoration:none;color:#333}
+.button{display:inline-block;padding:8px 12px;background:#2b6cb0;color:#fff;text-decoration:none;border-radius:4px}
+.simple-form input{width:50%}
+
+/* Responsive */
+@media (max-width:600px){
+  .search-form{flex-direction:column}
+  .simple-form input{width:100%}
+}
+
+/* Form layout for index.php */
+form{max-width:640px}
+label{font-weight:600}
+
+/* Dashboard layout */
+.app{display:flex;min-height:100vh}
+/* Collapsed sidebar (icons visible) that expands on hover */
+.sidebar{width:64px;background:#1f3a55;color:#fff;padding:18px 10px;box-shadow:2px 0 6px rgba(0,0,0,0.06);transition:width .22s ease, background .2s}
+.sidebar:hover, .sidebar:focus-within{width:220px}
+.sidebar .brand{display:flex;align-items:center;gap:10px;font-weight:700;margin-bottom:18px}
+.brand-icon{display:inline-flex;align-items:center;justify-content:center}
+.brand-label{white-space:nowrap;overflow:hidden;opacity:0;transform:translateX(-6px);transition:opacity .18s ease, transform .2s ease}
+.sidebar:hover .brand-label, .sidebar:focus-within .brand-label{opacity:1;transform:none}
+.sidebar .brand .dot{color:#f59e0b;margin-left:6px}
+.sidebar nav{display:flex;flex-direction:column}
+.sidebar nav a{display:flex;align-items:center;color:#cbd5e1;padding:10px;border-radius:8px;margin-bottom:8px;text-decoration:none;gap:12px}
+.sidebar nav a .icon{width:28px;flex:0 0 28px;text-align:center;font-size:16px}
+.sidebar nav a .label{white-space:nowrap;overflow:hidden;opacity:0;transform:translateX(-8px);transition:opacity .18s ease, transform .2s ease}
+.sidebar nav a.active, .sidebar nav a:hover{background:linear-gradient(90deg,#2563eb,#3b82f6);color:#fff}
+.sidebar:hover nav a .label, .sidebar:focus-within nav a .label{opacity:1;transform:none}
+.sidebar:hover nav a .icon, .sidebar:focus-within nav a .icon{color:#fff}
+
+.main{flex:1;padding:20px;background:linear-gradient(180deg,#f8fafc, #f1f5f9)}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.topbar .greeting{font-size:18px;font-weight:600}
+.topbar .search{padding:8px 10px;border-radius:6px;border:1px solid #e2e8f0}
+
+/* Top header (dark) */
+.top-header{background:linear-gradient(90deg,#274156,#2f4b63);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+.top-header .logo{display:flex;align-items:center;gap:12px}
+.logo-text{font-weight:700;font-size:16px}
+.logo-text small{font-weight:400;color:rgba(255,255,255,0.85);margin-left:6px}
+.top-header .top-right{display:flex;align-items:center;gap:12px}
+.top-header .welcome{opacity:0.9}
+.avatar img{width:40px;height:40px;border-radius:50%;border:2px solid rgba(255,255,255,0.12)}
+.btn-logout{background:transparent;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none}
+
+
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.stat-card{display:flex;align-items:center;padding:14px;border-radius:8px;color:#fff}
+.stat-card .stat-icon{font-size:28px;margin-right:12px}
+.stat-card .stat-title{font-size:13px;opacity:0.95}
+.stat-card .stat-value{font-size:26px;font-weight:700;margin-top:6px}
+.cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.stat-card.blue{background:linear-gradient(90deg,#1e90ff,#3aa0ff)}
+.stat-card.orange{background:linear-gradient(90deg,#ff8a3d,#ffb15a)}
+.stat-card.green{background:linear-gradient(90deg,#16a34a,#34d399)}
+.stat-card.purple{background:linear-gradient(90deg,#6d28d9,#9f7aea)}
+
+.panels{display:flex;gap:14px;margin-bottom:18px}
+.panel{background:#fff;padding:14px;border-radius:8px;flex:1;box-shadow:0 1px 4px rgba(2,6,23,0.06)}
+.panel h3{margin-top:0}
+.task-list{list-style:none;padding:0;margin:0}
+.task-list li{padding:6px 0;border-bottom:1px solid #f1f5f9}
+.calendar-placeholder{height:220px;background:linear-gradient(90deg,#eef2ff,#fff7ed);display:flex;align-items:center;justify-content:center;border-radius:6px;color:#374151}
+
+.table-panel{background:#fff;padding:14px;border-radius:8px;box-shadow:0 1px 4px rgba(2,6,23,0.06)}
+.table-panel h3{margin-top:0}
+.table{width:100%;border-collapse:collapse;margin-top:12px}
+.table th, .table td{padding:8px;border:1px solid #eee;text-align:left}
+
+/* Recent enrollments card and lists */
+.grid-main{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:18px}
+.chart-card{background:#fff;padding:16px;border-radius:8px;box-shadow:0 1px 6px rgba(2,6,23,0.04)}
+.chart-placeholder{height:220px;background:#fbfbfd;border-radius:6px;border:1px solid #eef2f6}
+.recent-table .table td, .recent-table .table th{border:none}
+
+.mini-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.list-card{background:#fff;padding:14px;border-radius:8px;box-shadow:0 1px 6px rgba(2,6,23,0.04)}
+.receipt-list li{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9}
+.receipt-list li:last-child{border-bottom:none}
+
+.courses-list .course{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9}
+.progress{height:10px;background:#eef2f6;border-radius:6px;overflow:hidden;width:70%}
+.progress > i{display:block;height:100%;background:#3b82f6}
+.course-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+
+@media (max-width:900px){
+  .cards-grid{grid-template-columns:repeat(2,1fr)}
+  .grid-main{grid-template-columns:1fr}
+  .mini-row{grid-template-columns:1fr}
+}
+
+@media (max-width:900px){
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .panels{flex-direction:column}
+  .sidebar{display:none}
+  .app{display:block}
+}
