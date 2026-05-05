@@ -28,6 +28,38 @@ $relationship = $_POST['relationship'] ?? '';
 $vaccination = isset($_POST['vax_status']) ? implode(', ', $_POST['vax_status']) : '';
 $signature = $_POST['signature'] ?? '';
 
+$subjectCodes = $_POST['subject_code'] ?? [];
+$subjectTitles = $_POST['subject_title'] ?? [];
+$subjectUnits = $_POST['subject_units'] ?? [];
+$subjectTimes = $_POST['subject_time'] ?? [];
+$subjectDays = $_POST['subject_day'] ?? [];
+
+$matriculationSubjects = [];
+for ($i = 0; $i < count($subjectCodes); $i++) {
+    $code = trim($subjectCodes[$i] ?? '');
+    $title = trim($subjectTitles[$i] ?? '');
+    $unit = trim($subjectUnits[$i] ?? '');
+    $time = trim($subjectTimes[$i] ?? '');
+    $day = trim($subjectDays[$i] ?? '');
+
+    if ($code === '' && $title === '') {
+        continue;
+    }
+
+    $matriculationSubjects[] = [
+        'code' => $code,
+        'title' => $title,
+        'units' => is_numeric($unit) ? (int) $unit : 0,
+        'time' => $time,
+        'day' => $day,
+    ];
+}
+
+$matriculationSubjectsJson = null;
+if (count($matriculationSubjects) > 0) {
+    $matriculationSubjectsJson = json_encode($matriculationSubjects, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+}
+
 // Handle file upload
 $payment_proof = null;
 if (isset($_FILES['payment_proof']) && $_FILES['payment_proof']['error'] === UPLOAD_ERR_OK) {
@@ -48,14 +80,14 @@ if (isset($_FILES['payment_proof']) && $_FILES['payment_proof']['error'] === UPL
 $token = bin2hex(random_bytes(16));
 
 // Insert into database
-$stmt = $conn->prepare("INSERT INTO students (surname, lastname, firstname, middlename, address, sex, cellphone, email, gcash_number, payment_ref, nationality, birthplace, birthdate, school, course, year_level, student_status, guardian, relationship, vaccination, signature, payment_proof, token) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+$stmt = $conn->prepare("INSERT INTO students (surname, lastname, firstname, middlename, address, sex, cellphone, email, gcash_number, payment_ref, nationality, birthplace, birthdate, school, course, year_level, student_status, guardian, relationship, vaccination, signature, matriculation_subjects, payment_proof, token) 
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
 if (!$stmt) {
     die('Query error: ' . $conn->error);
 }
 
-$stmt->bind_param('sssssssssssssssssssssss', $surname, $surname, $firstname, $middlename, $address, $sex, $cellphone, $email, $gcash_number, $payment_ref, $nationality, $birthplace, $birthdate, $school, $course, $year_level, $student_status, $guardian, $relationship, $vaccination, $signature, $payment_proof, $token);
+$stmt->bind_param('ssssssssssssssssssssssss', $surname, $surname, $firstname, $middlename, $address, $sex, $cellphone, $email, $gcash_number, $payment_ref, $nationality, $birthplace, $birthdate, $school, $course, $year_level, $student_status, $guardian, $relationship, $vaccination, $signature, $matriculationSubjectsJson, $payment_proof, $token);
 
 if ($stmt->execute()) {
     $student_id = $stmt->insert_id;

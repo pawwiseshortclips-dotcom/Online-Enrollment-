@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS students (
   relationship VARCHAR(255),
   vaccination VARCHAR(255),
   signature VARCHAR(255),
+  matriculation_subjects TEXT NULL,
   payment_proof VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

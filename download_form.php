@@ -159,6 +159,41 @@ $html = <<<'HTML'
                         </select>
                     </div>
                     <div>
+                        <label for="student_status">Student Status</label>
+                        <select id="student_status" name="student_status" required>
+                            <option value="">-- Select status --</option>
+                            <option value="regular">Regular</option>
+                            <option value="iregular">Iregular</option>
+                        </select>
+                    </div>
+                    <div id="subject-section" class="full" style="display:none; border:1px solid var(--border); padding:14px; border-radius:6px; background:#f8fafc;">
+                        <h3 style="margin-top:0; margin-bottom:10px; font-size:14px; color:var(--heading);">Subject Enrollment</h3>
+                        <p style="margin:0 0 12px; font-size:12px; color:var(--muted);">If you are irregular, enter the subjects you are enrolling in below before submitting.</p>
+                        <table style="width:100%;border-collapse:collapse;margin-bottom:12px;">
+                            <thead>
+                                <tr>
+                                    <th style="border:1px solid var(--border);padding:8px;background:#eef2ff;text-align:left;font-size:11px;">Subject Code</th>
+                                    <th style="border:1px solid var(--border);padding:8px;background:#eef2ff;text-align:left;font-size:11px;">Subject Title</th>
+                                    <th style="border:1px solid var(--border);padding:8px;background:#eef2ff;text-align:left;font-size:11px;">Units</th>
+                                    <th style="border:1px solid var(--border);padding:8px;background:#eef2ff;text-align:left;font-size:11px;">Time</th>
+                                    <th style="border:1px solid var(--border);padding:8px;background:#eef2ff;text-align:left;font-size:11px;">Day</th>
+                                    <th style="border:1px solid var(--border);padding:8px;background:#eef2ff;text-align:left;font-size:11px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border:1px solid var(--border);padding:8px;"><input type="text" name="subject_code[]" placeholder="Code"></td>
+                                    <td style="border:1px solid var(--border);padding:8px;"><input type="text" name="subject_title[]" placeholder="Title"></td>
+                                    <td style="border:1px solid var(--border);padding:8px;"><input type="number" name="subject_units[]" min="0" value="0"></td>
+                                    <td style="border:1px solid var(--border);padding:8px;"><input type="text" name="subject_time[]" placeholder="Time"></td>
+                                    <td style="border:1px solid var(--border);padding:8px;"><input type="text" name="subject_day[]" placeholder="Day"></td>
+                                    <td style="border:1px solid var(--border);padding:8px;"><button type="button" onclick="removeSubjectRow(this)" style="background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;">Remove</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" onclick="addSubjectRow()" style="background:#2563eb;color:#fff;border:none;padding:10px 14px;border-radius:5px;cursor:pointer;">Add another subject</button>
+                    </div>
+                    <div>
                         <label for="guardian">Parent &amp; Guardian</label>
                         <input id="guardian" name="guardian" type="text" required oninput="this.value=this.value.toUpperCase()">
                     </div>
@@ -205,6 +240,40 @@ $html = <<<'HTML'
             </div>
         </form>
     </article>
+    <script>
+        function addSubjectRow() {
+            const tbody = document.querySelector('#subject-section tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="border:1px solid var(--border);padding:8px;"><input type="text" name="subject_code[]" placeholder="Code"></td>
+                <td style="border:1px solid var(--border);padding:8px;"><input type="text" name="subject_title[]" placeholder="Title"></td>
+                <td style="border:1px solid var(--border);padding:8px;"><input type="number" name="subject_units[]" min="0" value="0"></td>
+                <td style="border:1px solid var(--border);padding:8px;"><input type="text" name="subject_time[]" placeholder="Time"></td>
+                <td style="border:1px solid var(--border);padding:8px;"><input type="text" name="subject_day[]" placeholder="Day"></td>
+                <td style="border:1px solid var(--border);padding:8px;"><button type="button" onclick="removeSubjectRow(this)" style="background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;">Remove</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function removeSubjectRow(button) {
+            const row = button.closest('tr');
+            const tbody = row.closest('tbody');
+            if (tbody.children.length > 1) {
+                row.remove();
+            } else {
+                row.querySelectorAll('input').forEach(input => input.value = '');
+            }
+        }
+
+        function toggleSubjectSection() {
+            const status = document.getElementById('student_status').value;
+            const section = document.getElementById('subject-section');
+            section.style.display = (status === 'iregular') ? 'block' : 'none';
+        }
+
+        document.getElementById('student_status').addEventListener('change', toggleSubjectSection);
+        document.addEventListener('DOMContentLoaded', toggleSubjectSection);
+    </script>
 </body>
 </html>
 HTML;

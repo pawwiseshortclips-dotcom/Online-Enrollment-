@@ -30,6 +30,7 @@ label{font-weight:600}
 
 /* Dashboard layout */
 .app{display:flex;min-height:100vh}
+.main > .container{max-width:none;width:100%;margin:0;padding:0;background:transparent;box-shadow:none;border-radius:0}
 /* Collapsed sidebar (icons visible) that expands on hover */
 .sidebar{width:64px;background:#1f3a55;color:#fff;padding:18px 10px;box-shadow:2px 0 6px rgba(0,0,0,0.06);transition:width .22s ease, background .2s}
 .sidebar:hover, .sidebar:focus-within{width:220px}

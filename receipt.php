@@ -6,7 +6,7 @@ if (empty($_GET['token'])) {
 }
 $token = $conn->real_escape_string($_GET['token']);
 
-$stmt = $conn->prepare("SELECT id, firstname, lastname, middlename, address, sex, nationality, birthplace, birthdate, school, guardian, relationship, vaccination, email, phone, gcash_number, course, year_level, payment_ref, payment_proof, student_status, created_at FROM students WHERE token = ? LIMIT 1");
+$stmt = $conn->prepare("SELECT id, firstname, lastname, middlename, address, sex, nationality, birthplace, birthdate, school, guardian, relationship, vaccination, email, cellphone, gcash_number, course, year_level, payment_ref, payment_proof, student_status, created_at FROM students WHERE token = ? LIMIT 1");
 $stmt->bind_param('s', $token);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -67,7 +67,7 @@ $qr_src = 'https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=' . urlenco
 <div class="field"><strong>Vaccination:</strong> <?php echo htmlspecialchars($row['vaccination']); ?></div>
 <div class="field"><strong>Email:</strong> <?php echo htmlspecialchars($row['email']); ?></div>
 <div class="field"><strong>GCash Number:</strong> <?php echo htmlspecialchars($row['gcash_number']); ?></div>
-<div class="field"><strong>Phone:</strong> <?php echo htmlspecialchars($row['phone']); ?></div>
+<div class="field"><strong>Cellphone Number:</strong> <?php echo htmlspecialchars($row['cellphone']); ?></div>
 <div class="field"><strong>Reference Number:</strong> <?php echo htmlspecialchars($row['payment_ref']); ?></div>
 <div class="field"><strong>Course:</strong> <?php echo htmlspecialchars($row['course']); ?></div>
 

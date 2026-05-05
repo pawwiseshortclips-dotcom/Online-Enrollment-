@@ -23,7 +23,7 @@ if (!$enrollment) {
     die('Enrollment not found.');
 }
 
-if (!in_array($enrollment['student_status'], ['iregular', 'eregular'], true)) {
+if (!in_array($enrollment['student_status'], ['iregular'], true)) {
     http_response_code(403);
     die('This enrollment is not marked as iregular.');
 }

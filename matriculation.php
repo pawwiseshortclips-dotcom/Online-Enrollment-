@@ -8,7 +8,7 @@ if ($token === '') {
     exit;
 }
 
-$stmt = $conn->prepare("SELECT id, surname, firstname, middlename, lastname, course, year_level, student_status, created_at FROM students WHERE token = ? LIMIT 1");
+$stmt = $conn->prepare("SELECT id, surname, firstname, middlename, lastname, course, year_level, student_status, created_at, matriculation_subjects FROM students WHERE token = ? LIMIT 1");
 if (!$stmt) {
     die('Query error: ' . $conn->error);
 }
@@ -21,6 +21,57 @@ $stmt->close();
 if (!$enrollment) {
     http_response_code(404);
     die('Enrollment not found.');
+}
+
+$saveMessage = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $subjectCodes = $_POST['subject_code'] ?? [];
+    $subjectTitles = $_POST['subject_title'] ?? [];
+    $subjectUnits = $_POST['subject_units'] ?? [];
+    $subjectTimes = $_POST['subject_time'] ?? [];
+    $subjectDays = $_POST['subject_day'] ?? [];
+
+    $updatedSubjects = [];
+    for ($i = 0; $i < count($subjectCodes); $i++) {
+        $code = trim($subjectCodes[$i] ?? '');
+        $title = trim($subjectTitles[$i] ?? '');
+        $unit = trim($subjectUnits[$i] ?? '');
+        $time = trim($subjectTimes[$i] ?? '');
+        $day = trim($subjectDays[$i] ?? '');
+
+        if ($code === '' && $title === '') {
+            continue;
+        }
+
+        $updatedSubjects[] = [
+            'code' => $code,
+            'title' => $title,
+            'units' => is_numeric($unit) ? (int) $unit : 0,
+            'time' => $time,
+            'day' => $day,
+        ];
+    }
+
+    $updatedSubjectsJson = null;
+    if (count($updatedSubjects) > 0) {
+        $updatedSubjectsJson = json_encode($updatedSubjects, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
+    $updateStmt = $conn->prepare("UPDATE students SET matriculation_subjects = ? WHERE token = ?");
+    if ($updateStmt) {
+        $updateStmt->bind_param('ss', $updatedSubjectsJson, $token);
+        $updateStmt->execute();
+        $updateStmt->close();
+        $subjects = $updatedSubjects;
+        $saveMessage = 'Subjects updated successfully.';
+    }
+}
+
+if (!empty($enrollment['matriculation_subjects']) && empty($saveMessage)) {
+    $decodedSubjects = json_decode($enrollment['matriculation_subjects'], true);
+    if (is_array($decodedSubjects) && count($decodedSubjects) > 0) {
+        $subjects = $decodedSubjects;
+    }
 }
 
 $total_units = array_sum(array_column($subjects, 'units'));
@@ -124,8 +175,64 @@ $payment_schedule = [
             </div>
             <div class="info-box">
                 <strong>Student Status</strong>
-                <?php echo htmlspecialchars(ucfirst(str_replace('iregular', 'Iregular', str_replace('eregular', 'iregular', $enrollment['student_status'])))); ?>
+                <?php echo htmlspecialchars(ucfirst(str_replace('iregular', 'Iregular', $enrollment['student_status']))); ?>
             </div>
+        </div>
+
+        <?php if ($saveMessage): ?>
+            <div style="padding:12px;margin-bottom:16px;background:#d1fae5;border:1px solid #34d399;color:#065f46;border-radius:6px;">
+                <?php echo htmlspecialchars($saveMessage); ?>
+            </div>
+        <?php endif; ?>
+
+        <div style="margin-bottom:18px;">
+            <button type="button" onclick="toggleEditSubjects()" style="padding:10px 14px;background:#2563eb;color:#fff;border:none;border-radius:5px;cursor:pointer;">Edit Subjects</button>
+        </div>
+
+        <div id="edit-subjects-panel" style="display:none;background:#f8fafc;padding:16px;border:1px solid #cbd5e1;border-radius:8px;margin-bottom:18px;">
+            <h2 style="margin-top:0;font-size:18px;">Update Registered Subjects</h2>
+            <p style="margin:0 0 12px;color:#475569;">Replace, remove, or change the subject rows below, then click Save.</p>
+            <form method="post" action="matriculation.php?token=<?php echo urlencode($token); ?>">
+                <table class="subjects-table" id="edit-subjects-table">
+                    <thead>
+                        <tr>
+                            <th>Subject Code</th>
+                            <th>Subject Title</th>
+                            <th>Units</th>
+                            <th>Time</th>
+                            <th>Day</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (count($subjects) === 0): ?>
+                            <tr>
+                                <td><input type="text" name="subject_code[]" value="" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                                <td><input type="text" name="subject_title[]" value="" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                                <td><input type="number" name="subject_units[]" min="0" value="0" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                                <td><input type="text" name="subject_time[]" value="" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                                <td><input type="text" name="subject_day[]" value="" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                                <td><button type="button" onclick="removeSubjectRow(this)" style="background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;">Remove</button></td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($subjects as $subject): ?>
+                                <tr>
+                                    <td><input type="text" name="subject_code[]" value="<?php echo htmlspecialchars($subject['code']); ?>" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                                    <td><input type="text" name="subject_title[]" value="<?php echo htmlspecialchars($subject['title']); ?>" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                                    <td><input type="number" name="subject_units[]" min="0" value="<?php echo htmlspecialchars($subject['units']); ?>" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                                    <td><input type="text" name="subject_time[]" value="<?php echo htmlspecialchars($subject['time']); ?>" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                                    <td><input type="text" name="subject_day[]" value="<?php echo htmlspecialchars($subject['day']); ?>" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                                    <td><button type="button" onclick="removeSubjectRow(this)" style="background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;">Remove</button></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+                <div style="margin-top:14px; display:flex; gap:10px; align-items:center;">
+                    <button type="button" onclick="addSubjectRow()" style="padding:10px 14px;background:#2563eb;color:#fff;border:none;border-radius:5px;cursor:pointer;">Add another subject</button>
+                    <button type="submit" style="padding:10px 14px;background:#10b981;color:#fff;border:none;border-radius:5px;cursor:pointer;">Save Subjects</button>
+                </div>
+            </form>
         </div>
 
         <h2 style="margin:0 0 10px; font-size:16px;">Registered Subjects</h2>
@@ -194,5 +301,35 @@ $payment_schedule = [
             <div>Approved by Registrar</div>
         </div>
     </div>
+    <script>
+        function toggleEditSubjects() {
+            const panel = document.getElementById('edit-subjects-panel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function addSubjectRow() {
+            const tbody = document.querySelector('#edit-subjects-table tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" name="subject_code[]" value="" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                <td><input type="text" name="subject_title[]" value="" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                <td><input type="number" name="subject_units[]" min="0" value="0" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                <td><input type="text" name="subject_time[]" value="" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                <td><input type="text" name="subject_day[]" value="" style="width:100%;padding:6px;border:1px solid #cbd5e1;border-radius:4px;"></td>
+                <td><button type="button" onclick="removeSubjectRow(this)" style="background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;">Remove</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function removeSubjectRow(button) {
+            const row = button.closest('tr');
+            const tbody = row.closest('tbody');
+            if (tbody.children.length > 1) {
+                row.remove();
+            } else {
+                row.querySelectorAll('input').forEach(input => input.value = '');
+            }
+        }
+    </script>
 </body>
 </html>

@@ -1,14 +1,14 @@
 [
     {
         "code": "ESP",
-        "title": "nOBODYKNOWS",
+        "title": "SCIENCE",
         "units": 1,
         "time": "8:00-9:30 AM",
         "day": "MWF"
     },
     {
         "code": "ISP 301",
-        "title": "Evaluation of Business Performance",
+        "title": "MATH",
         "units": 3,
         "time": "10:00-11:30 AM",
         "day": "TTH"
@@ -36,7 +36,7 @@
     },
     {
         "code": "ABC",
-        "title": "NEW PRDUCT",
+        "title": "ENLISH",
         "units": 3,
         "time": "8:00-9:30 AM",
         "day": "MWF"

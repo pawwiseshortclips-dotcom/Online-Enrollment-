@@ -1,7 +1,34 @@
 <?php
+require_once __DIR__ . '/database.php';
+
 $subjectFile = __DIR__ . '/subjects.json';
+$token = trim($_GET['token'] ?? '');
 $subjects = [];
-if (file_exists($subjectFile)) {
+$student = null;
+$editingStudent = false;
+$saveError = '';
+
+if ($token !== '') {
+    $stmt = $conn->prepare("SELECT matriculation_subjects FROM students WHERE token = ? LIMIT 1");
+    if ($stmt) {
+        $stmt->bind_param('s', $token);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $student = $result->fetch_assoc();
+        $stmt->close();
+    }
+    if ($student) {
+        $editingStudent = true;
+        if (!empty($student['matriculation_subjects'])) {
+            $decoded = json_decode($student['matriculation_subjects'], true);
+            if (is_array($decoded)) {
+                $subjects = $decoded;
+            }
+        }
+    }
+}
+
+if (!$editingStudent && file_exists($subjectFile)) {
     $json = file_get_contents($subjectFile);
     $decoded = json_decode($json, true);
     if (is_array($decoded)) {
@@ -37,9 +64,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
     }
 
-    file_put_contents($subjectFile, json_encode($newSubjects, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-    $subjects = $newSubjects;
-    $saved = true;
+    if ($token !== '' && $editingStudent) {
+        $jsonSubjects = json_encode($newSubjects, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $stmt = $conn->prepare("UPDATE students SET matriculation_subjects = ? WHERE token = ?");
+        if ($stmt) {
+            $stmt->bind_param('ss', $jsonSubjects, $token);
+            $stmt->execute();
+            $stmt->close();
+            $subjects = $newSubjects;
+            $saved = true;
+        } else {
+            $saveError = 'Unable to save subjects to student record.';
+        }
+    } else {
+        if ($token !== '' && !$editingStudent) {
+            $saveError = 'Student not found for the provided token.';
+        } else {
+            file_put_contents($subjectFile, json_encode($newSubjects, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            $subjects = $newSubjects;
+            $saved = true;
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -88,11 +133,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="container">
-        <h1>Edit Matriculation Subjects</h1>
+        <h1>Edit Matriculation Subjects<?php if ($token !== ''): ?> for <?php echo htmlspecialchars($token); ?><?php endif; ?></h1>
         <p class="note">Change the subjects that appear on the matriculation form. Add, remove, or update subject code, title, units, time, and day. Click Save when finished.</p>
+        <?php if (!empty($saveError)): ?>
+            <div class="message" style="background:#fee2e2;border-color:#fecaca;color:#991b1b;"><?php echo htmlspecialchars($saveError); ?></div>
+        <?php endif; ?>
         <?php if (!empty($saved)): ?>
             <div class="message">Subjects saved successfully.</div>
         <?php endif; ?>
+
         <form method="post">
             <table class="subject-table" id="subjects-table">
                 <thead>
@@ -135,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </form>
         <div class="footer">
-            <a class="primary" href="matriculation.php?token=<?php echo urlencode($_GET['token'] ?? ''); ?>">Back to Matriculation</a>
+            <a class="primary" href="matriculation.php?token=<?php echo urlencode($token); ?>">Back to Matriculation</a>
             <a href="subjects.json" target="_blank">View subjects.json</a>
         </div>
     </div>

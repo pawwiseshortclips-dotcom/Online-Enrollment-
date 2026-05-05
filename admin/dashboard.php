@@ -59,6 +59,9 @@ $payments_count = $conn->query('SELECT COUNT(*) AS c FROM students WHERE payment
         <a href="students.php"><span class="icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5z" fill="#fff"/></svg>
         </span><span class="label">Students</span></a>
+        <a href="matriculation.php"><span class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16v4H4V4zm0 6h16v10H4V10zm3 3v4h10v-4H7z" fill="#fff"/></svg>
+        </span><span class="label">Matriculation</span></a>
         <a href="courses.php"><span class="icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L1 7l11 5 9-4.09V17h2V7L12 2z" fill="#fff"/></svg>
         </span><span class="label">Courses</span></a>

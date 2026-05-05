@@ -59,9 +59,16 @@ $conn->query("CREATE TABLE IF NOT EXISTS students (
     relationship VARCHAR(255),
     vaccination VARCHAR(255),
     signature VARCHAR(255),
+    matriculation_subjects TEXT NULL,
     payment_proof VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+// Add matriculation_subjects column if missing for older databases
+$matricColumnCheck = $conn->query("SHOW COLUMNS FROM students LIKE 'matriculation_subjects'");
+if ($matricColumnCheck && $matricColumnCheck->num_rows === 0) {
+    $conn->query("ALTER TABLE students ADD COLUMN matriculation_subjects TEXT NULL AFTER signature");
+}
 
 // Ensure the admins table exists for admin logins
 $conn->query("CREATE TABLE IF NOT EXISTS admins (

@@ -8,7 +8,7 @@
         :root{--paper-bg:#faf9f1;--border:#ccc;--text:#1a1a1a;--muted:#555;--heading:#0b2240;--accent:#1d4ed8;--shadow:0 3px 12px rgba(0,0,0,.08)}
         *{box-sizing:border-box}
         body{margin:0;background:#e7e7e7;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;color:var(--text)}
-        .page{max-width:900px;margin:30px auto;padding:30px;background:var(--paper-bg);border:1px solid var(--border);box-shadow:var(--shadow)}
+        .page{max-width:none;width:100%;min-height:100vh;margin:0;padding:30px;background:var(--paper-bg);border:none;box-shadow:none}
         .page h1{margin:0;font-size:24px;text-align:center;letter-spacing:.04em;color:var(--heading)}
         .page h2{margin:24px 0 12px;font-size:16px;color:var(--heading);border-bottom:1px solid var(--border);padding-bottom:6px}
         .procs{margin:18px 0 24px;padding-left:18px}
@@ -173,6 +173,33 @@
                             <option value="iregular">Iregular</option>
                         </select>
                     </div>
+                    <div id="subject-section" class="full" style="display:none; border:1px solid #cbd5e1; padding:16px; border-radius:8px; background:#f8fafc;">
+                        <h3 style="margin-top:0;">Subject Enrollment</h3>
+                        <p style="margin:0 0 12px; color:#475569;">If you are irregular/need specific subjects, enter the subjects you are enrolling in before submitting.</p>
+                        <table class="subject-table" id="student-subjects-table" style="width:100%;border-collapse:collapse;margin-bottom:12px;">
+                            <thead>
+                                <tr>
+                                    <th style="border:1px solid #cbd5e1;padding:8px;background:#eef2ff;">Subject Code</th>
+                                    <th style="border:1px solid #cbd5e1;padding:8px;background:#eef2ff;">Subject Title</th>
+                                    <th style="border:1px solid #cbd5e1;padding:8px;background:#eef2ff;">Units</th>
+                                    <th style="border:1px solid #cbd5e1;padding:8px;background:#eef2ff;">Time</th>
+                                    <th style="border:1px solid #cbd5e1;padding:8px;background:#eef2ff;">Day</th>
+                                    <th style="border:1px solid #cbd5e1;padding:8px;background:#eef2ff;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border:1px solid #cbd5e1;padding:8px;"><input type="text" name="subject_code[]" placeholder="Code"></td>
+                                    <td style="border:1px solid #cbd5e1;padding:8px;"><input type="text" name="subject_title[]" placeholder="Title"></td>
+                                    <td style="border:1px solid #cbd5e1;padding:8px;"><input type="number" name="subject_units[]" min="0" value="0"></td>
+                                    <td style="border:1px solid #cbd5e1;padding:8px;"><input type="text" name="subject_time[]" placeholder="Time"></td>
+                                    <td style="border:1px solid #cbd5e1;padding:8px;"><input type="text" name="subject_day[]" placeholder="Day"></td>
+                                    <td style="border:1px solid #cbd5e1;padding:8px;"><button type="button" onclick="removeSubjectRow(this)" style="background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;">Remove</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" onclick="addSubjectRow()" style="background:#2563eb;color:#fff;border:none;padding:10px 14px;border-radius:5px;cursor:pointer;">Add another subject</button>
+                    </div>
                     <div>
                         <label for="guardian">Parent &amp; Guardian</label>
                         <input id="guardian" name="guardian" type="text" required oninput="this.value=this.value.toUpperCase()">
@@ -205,5 +232,39 @@
             </div>
         </form>
     </article>
+    <script>
+        function addSubjectRow() {
+            const tbody = document.querySelector('#student-subjects-table tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="border:1px solid #cbd5e1;padding:8px;"><input type="text" name="subject_code[]" placeholder="Code"></td>
+                <td style="border:1px solid #cbd5e1;padding:8px;"><input type="text" name="subject_title[]" placeholder="Title"></td>
+                <td style="border:1px solid #cbd5e1;padding:8px;"><input type="number" name="subject_units[]" min="0" value="0"></td>
+                <td style="border:1px solid #cbd5e1;padding:8px;"><input type="text" name="subject_time[]" placeholder="Time"></td>
+                <td style="border:1px solid #cbd5e1;padding:8px;"><input type="text" name="subject_day[]" placeholder="Day"></td>
+                <td style="border:1px solid #cbd5e1;padding:8px;"><button type="button" onclick="removeSubjectRow(this)" style="background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;">Remove</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function removeSubjectRow(button) {
+            const row = button.closest('tr');
+            const tbody = row.closest('tbody');
+            if (tbody.children.length > 1) {
+                row.remove();
+            } else {
+                row.querySelectorAll('input').forEach(input => input.value = '');
+            }
+        }
+
+        function toggleSubjectSection() {
+            const status = document.getElementById('student_status').value;
+            const section = document.getElementById('subject-section');
+            section.style.display = (status === 'iregular') ? 'block' : 'none';
+        }
+
+        document.getElementById('student_status').addEventListener('change', toggleSubjectSection);
+        document.addEventListener('DOMContentLoaded', toggleSubjectSection);
+    </script>
 </body>
 </html>

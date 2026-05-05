@@ -6,7 +6,7 @@ if (empty($_GET['token'])) {
 }
 $token = $conn->real_escape_string($_GET['token']);
 
-$stmt = $conn->prepare("SELECT id, firstname, lastname, middlename, address, sex, nationality, birthplace, birthdate, school, guardian, relationship, vaccination, email, phone, gcash_number, course, year_level, payment_ref, payment_proof, student_status, created_at FROM students WHERE token = ? LIMIT 1");
+$stmt = $conn->prepare("SELECT id, firstname, lastname, middlename, address, sex, nationality, birthplace, birthdate, school, guardian, relationship, vaccination, email, cellphone, gcash_number, course, year_level, payment_ref, payment_proof, student_status, created_at FROM students WHERE token = ? LIMIT 1");
 $stmt->bind_param('s', $token);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -72,7 +72,7 @@ $html = "<!doctype html><html><head><meta charset=\"utf-8\"><title>Receipt</titl
 <div class='field'><strong>Vaccination:</strong> " . htmlspecialchars($row['vaccination']) . "</div>
 <div class='field'><strong>Email:</strong> " . htmlspecialchars($row['email']) . "</div>
 <div class='field'><strong>GCash Number:</strong> " . htmlspecialchars($row['gcash_number']) . "</div>
-<div class='field'><strong>Phone:</strong> " . htmlspecialchars($row['phone']) . "</div>
+<div class='field'><strong>Cellphone Number:</strong> " . htmlspecialchars($row['cellphone']) . "</div>
 <div class='field'><strong>Reference Number:</strong> " . htmlspecialchars($row['payment_ref']) . "</div>
 <div class='field'><strong>Course:</strong> " . htmlspecialchars($row['course']) . "</div>
 <div class='field'><strong>Year Level:</strong> " . htmlspecialchars($row['year_level']) . "</div>
