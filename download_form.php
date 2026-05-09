@@ -159,6 +159,15 @@ $html = <<<'HTML'
                         </select>
                     </div>
                     <div>
+                        <label for="semester">Semester</label>
+                        <select id="semester" name="semester" required>
+                            <option value="">-- Select semester --</option>
+                            <option value="1st Semester">1st Semester</option>
+                            <option value="2nd Semester">2nd Semester</option>
+                            <option value="Summer">Summer</option>
+                        </select>
+                    </div>
+                    <div>
                         <label for="student_status">Student Status</label>
                         <select id="student_status" name="student_status" required>
                             <option value="">-- Select status --</option>
@@ -200,15 +209,6 @@ $html = <<<'HTML'
                     <div>
                         <label for="relationship">Relationship to Student</label>
                         <input id="relationship" name="relationship" type="text" required oninput="this.value=this.value.toUpperCase()">
-                    </div>
-                    <div class="full">
-                        <label>Covid Vaccination Status</label>
-                        <div class="checkbox-grid">
-                            <label><input type="checkbox" name="vax_status[]" value="Fully Vaccinated w/ Booster"> Fully Vaccinated w/ Booster</label>
-                            <label><input type="checkbox" name="vax_status[]" value="Fully Vaccinated"> Fully Vaccinated</label>
-                            <label><input type="checkbox" name="vax_status[]" value="Partially Vaccinated"> Partially Vaccinated</label>
-                            <label><input type="checkbox" name="vax_status[]" value="Unvaccinated"> Unvaccinated</label>
-                        </div>
                     </div>
                     <div class="full">
                         <label for="gcash_number">GCash Number (for online payment)</label>

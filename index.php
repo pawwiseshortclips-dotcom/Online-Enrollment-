@@ -116,6 +116,11 @@
                         <input id="gcash_number" name="gcash_number" type="text" required maxlength="13" pattern="^(09\d{9}|\+639\d{9})$" placeholder="09XXXXXXXXX or +639XXXXXXXXX">
                         <div class="note">Must be a Philippine mobile number used for GCash payments.</div>
                     </div>
+                    <div style="background:#fff3cd;border:2px solid #ffc107;padding:14px;border-radius:8px;margin-top:8px;grid-column:1/-1;">
+                        <label style="color:#92400e;font-weight:700;font-size:14px;">Bank Account Number</label>
+                        <div style="margin-top:8px;font-size:18px;font-weight:800;color:#92400e;">1234567890123</div>
+                        <div class="note" style="color:#92400e;">Fixed account number for payments. Admin can change this number on student records if needed.</div>
+                    </div>
                     <div>
                         <label for="reference_number">GCash Reference Number</label>
                         <input id="reference_number" name="reference_number" type="text" required placeholder="Enter payment reference number">
@@ -166,6 +171,15 @@
                         </select>
                     </div>
                     <div>
+                        <label for="semester">Semester</label>
+                        <select id="semester" name="semester" required>
+                            <option value="">-- Select semester --</option>
+                            <option value="1st Semester">1st Semester</option>
+                            <option value="2nd Semester">2nd Semester</option>
+                            <option value="Summer">Summer</option>
+                        </select>
+                    </div>
+                    <div>
                         <label for="student_status">Student Status</label>
                         <select id="student_status" name="student_status" required>
                             <option value="">-- Select status --</option>
@@ -207,15 +221,6 @@
                     <div>
                         <label for="relationship">Relationship to Student</label>
                         <input id="relationship" name="relationship" type="text" required oninput="this.value=this.value.toUpperCase()">
-                    </div>
-                    <div class="full">
-                        <label>Covid Vaccination Status</label>
-                        <div class="checkbox-grid">
-                            <label><input type="checkbox" name="vax_status[]" value="Fully Vaccinated w/ Booster"> Fully Vaccinated w/ Booster</label>
-                            <label><input type="checkbox" name="vax_status[]" value="Fully Vaccinated"> Fully Vaccinated</label>
-                            <label><input type="checkbox" name="vax_status[]" value="Partially Vaccinated"> Partially Vaccinated</label>
-                            <label><input type="checkbox" name="vax_status[]" value="Unvaccinated"> Unvaccinated</label>
-                        </div>
                     </div>
                     <div class="full">
                         <p><strong>Agreement:</strong> "I hereby signify to abide with the rules and regulations promulgated by this institution."</p>

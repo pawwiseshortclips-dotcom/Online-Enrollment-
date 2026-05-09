@@ -7,7 +7,7 @@ header('Content-Type: text/csv');
 header('Content-Disposition: attachment; filename="enrollments_export_' . date('Ymd_His') . '.csv"');
 
 $out = fopen('php://output','w');
-fputcsv($out, ['id','token','firstname','lastname','middlename','address','sex','nationality','birthplace','birthdate','school','guardian','relationship','signature','vaccination','email','cellphone','gcash_number','course','year_level','payment_ref','payment_proof','created_at']);
+fputcsv($out, ['id','token','firstname','lastname','middlename','address','sex','nationality','birthplace','birthdate','school','guardian','relationship','signature','semester','email','cellphone','gcash_number','course','year_level','payment_ref','payment_proof','created_at']);
 
 $q = trim($_GET['q'] ?? '');
 $course = trim($_GET['course'] ?? '');
@@ -20,7 +20,7 @@ if ($q !== '') { $where[] = "(firstname LIKE ? OR lastname LIKE ? OR email LIKE 
 if ($course !== '') { $where[] = 'course = ?'; $params[] = $course; $types .= 's'; }
 if ($year !== '') { $where[] = 'year_level = ?'; $params[] = $year; $types .= 's'; }
 
-$sql = 'SELECT id, token, firstname, lastname, middlename, address, sex, nationality, birthplace, birthdate, school, guardian, relationship, signature, vaccination, email, cellphone, gcash_number, course, year_level, payment_ref, payment_proof, student_status, created_at FROM students';
+$sql = 'SELECT id, token, firstname, lastname, middlename, address, sex, nationality, birthplace, birthdate, school, guardian, relationship, signature, semester, email, cellphone, gcash_number, course, year_level, payment_ref, payment_proof, student_status, created_at FROM students';
 if ($where) { $sql .= ' WHERE ' . implode(' AND ', $where); }
 
 $stmt = $conn->prepare($sql);
@@ -28,7 +28,7 @@ if ($types) { $stmt->bind_param($types, ...$params); }
 $stmt->execute();
 $res = $stmt->get_result();
 while($r = $res->fetch_assoc()) {
-    fputcsv($out, [$r['id'],$r['token'],$r['firstname'],$r['lastname'],$r['middlename'],$r['address'],$r['sex'],$r['nationality'],$r['birthplace'],$r['birthdate'],$r['school'],$r['guardian'],$r['relationship'],$r['signature'],$r['vaccination'],$r['email'],$r['cellphone'],$r['gcash_number'],$r['course'],$r['year_level'],$r['payment_ref'],$r['payment_proof'],$r['created_at']]);
+    fputcsv($out, [$r['id'],$r['token'],$r['firstname'],$r['lastname'],$r['middlename'],$r['address'],$r['sex'],$r['nationality'],$r['birthplace'],$r['birthdate'],$r['school'],$r['guardian'],$r['relationship'],$r['signature'],$r['semester'],$r['email'],$r['cellphone'],$r['gcash_number'],$r['course'],$r['year_level'],$r['payment_ref'],$r['payment_proof'],$r['created_at']]);
 }
 fclose($out);
 exit;

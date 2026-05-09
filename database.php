@@ -47,6 +47,8 @@ $conn->query("CREATE TABLE IF NOT EXISTS students (
     cellphone VARCHAR(100),
     email VARCHAR(255),
     gcash_number VARCHAR(100),
+    bank_account_number VARCHAR(100),
+    approval_status VARCHAR(20) DEFAULT 'pending',
     payment_ref VARCHAR(255),
     nationality VARCHAR(100),
     birthplace VARCHAR(100),
@@ -54,10 +56,19 @@ $conn->query("CREATE TABLE IF NOT EXISTS students (
     school VARCHAR(255),
     course VARCHAR(255),
     year_level VARCHAR(50),
+    semester VARCHAR(50),
     student_status VARCHAR(50),
+    registration_fee DECIMAL(10,2) DEFAULT 0.00,
+    tuition_fee DECIMAL(10,2) DEFAULT 0.00,
+    lab_fee DECIMAL(10,2) DEFAULT 0.00,
+    misc_fee DECIMAL(10,2) DEFAULT 0.00,
+    upon_registration DECIMAL(10,2) DEFAULT 4700.00,
+    prelim_fee DECIMAL(10,2) DEFAULT 0.00,
+    midterm_fee DECIMAL(10,2) DEFAULT 0.00,
+    semi_final_fee DECIMAL(10,2) DEFAULT 0.00,
+    final_fee DECIMAL(10,2) DEFAULT 0.00,
     guardian VARCHAR(255),
     relationship VARCHAR(255),
-    vaccination VARCHAR(255),
     signature VARCHAR(255),
     matriculation_subjects TEXT NULL,
     payment_proof VARCHAR(255),
@@ -68,6 +79,49 @@ $conn->query("CREATE TABLE IF NOT EXISTS students (
 $matricColumnCheck = $conn->query("SHOW COLUMNS FROM students LIKE 'matriculation_subjects'");
 if ($matricColumnCheck && $matricColumnCheck->num_rows === 0) {
     $conn->query("ALTER TABLE students ADD COLUMN matriculation_subjects TEXT NULL AFTER signature");
+}
+
+// Add bank_account_number column if missing for older databases
+$bankColumnCheck = $conn->query("SHOW COLUMNS FROM students LIKE 'bank_account_number'");
+if ($bankColumnCheck && $bankColumnCheck->num_rows === 0) {
+    $conn->query("ALTER TABLE students ADD COLUMN bank_account_number VARCHAR(100) AFTER gcash_number");
+}
+
+// Add approval_status column if missing for older databases
+$approvalColumnCheck = $conn->query("SHOW COLUMNS FROM students LIKE 'approval_status'");
+if ($approvalColumnCheck && $approvalColumnCheck->num_rows === 0) {
+    $conn->query("ALTER TABLE students ADD COLUMN approval_status VARCHAR(20) DEFAULT 'pending' AFTER bank_account_number");
+}
+
+// Add semester column if missing
+$semesterColumnCheck = $conn->query("SHOW COLUMNS FROM students LIKE 'semester'");
+if ($semesterColumnCheck && $semesterColumnCheck->num_rows === 0) {
+    $conn->query("ALTER TABLE students ADD COLUMN semester VARCHAR(50) AFTER year_level");
+}
+
+// Add fee fields if missing
+$feeColumns = [
+    'registration_fee' => "DECIMAL(10,2) DEFAULT 0.00 AFTER student_status",
+    'tuition_fee' => "DECIMAL(10,2) DEFAULT 0.00 AFTER registration_fee",
+    'lab_fee' => "DECIMAL(10,2) DEFAULT 0.00 AFTER tuition_fee",
+    'misc_fee' => "DECIMAL(10,2) DEFAULT 0.00 AFTER lab_fee",
+    'upon_registration' => "DECIMAL(10,2) DEFAULT 4700.00 AFTER misc_fee",
+    'prelim_fee' => "DECIMAL(10,2) DEFAULT 0.00 AFTER upon_registration",
+    'midterm_fee' => "DECIMAL(10,2) DEFAULT 0.00 AFTER prelim_fee",
+    'semi_final_fee' => "DECIMAL(10,2) DEFAULT 0.00 AFTER midterm_fee",
+    'final_fee' => "DECIMAL(10,2) DEFAULT 0.00 AFTER semi_final_fee",
+];
+foreach ($feeColumns as $col => $definition) {
+    $feeColumnCheck = $conn->query("SHOW COLUMNS FROM students LIKE '" . $conn->real_escape_string($col) . "'");
+    if ($feeColumnCheck && $feeColumnCheck->num_rows === 0) {
+        $conn->query("ALTER TABLE students ADD COLUMN $col $definition");
+    }
+}
+
+// Remove vaccination column if it exists
+$vaccinationColumnCheck = $conn->query("SHOW COLUMNS FROM students LIKE 'vaccination'");
+if ($vaccinationColumnCheck && $vaccinationColumnCheck->num_rows > 0) {
+    $conn->query("ALTER TABLE students DROP COLUMN vaccination");
 }
 
 // Ensure the admins table exists for admin logins

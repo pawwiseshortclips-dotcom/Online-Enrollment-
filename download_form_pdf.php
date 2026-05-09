@@ -277,16 +277,6 @@ if (!file_exists($autoload)) {
             </div>
         </div>
 
-        <h2>VACCINATION STATUS</h2>
-        <div class="form-grid full">
-            <div class="checkbox-group">
-                <label><input type="checkbox"> Fully Vaccinated w/ Booster</label>
-                <label><input type="checkbox"> Fully Vaccinated</label>
-                <label><input type="checkbox"> Partially Vaccinated</label>
-                <label><input type="checkbox"> Unvaccinated</label>
-            </div>
-        </div>
-
         <h2>PAYMENT INFORMATION (Optional - for online payment only)</h2>
         
         <div class="form-grid">
@@ -565,14 +555,6 @@ $html = <<<'HTML'
                     <label>Relationship *</label>
                     <input type="text">
                 </div>
-            </div>
-
-            <h2>VACCINATION STATUS</h2>
-            <div class="checkbox-group">
-                <label><input type="checkbox"> Fully Vaccinated w/ Booster</label>
-                <label><input type="checkbox"> Fully Vaccinated</label>
-                <label><input type="checkbox"> Partially Vaccinated</label>
-                <label><input type="checkbox"> Unvaccinated</label>
             </div>
 
             <h2>PAYMENT INFORMATION (Optional - for online payment only)</h2>

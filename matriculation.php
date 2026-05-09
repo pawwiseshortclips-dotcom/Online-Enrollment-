@@ -8,7 +8,7 @@ if ($token === '') {
     exit;
 }
 
-$stmt = $conn->prepare("SELECT id, surname, firstname, middlename, lastname, course, year_level, student_status, created_at, matriculation_subjects FROM students WHERE token = ? LIMIT 1");
+$stmt = $conn->prepare("SELECT id, surname, firstname, middlename, lastname, course, year_level, student_status, registration_fee, tuition_fee, lab_fee, misc_fee, upon_registration, prelim_fee, midterm_fee, semi_final_fee, final_fee, created_at, matriculation_subjects FROM students WHERE token = ? LIMIT 1");
 if (!$stmt) {
     die('Query error: ' . $conn->error);
 }
@@ -25,45 +25,47 @@ if (!$enrollment) {
 
 $saveMessage = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $subjectCodes = $_POST['subject_code'] ?? [];
-    $subjectTitles = $_POST['subject_title'] ?? [];
-    $subjectUnits = $_POST['subject_units'] ?? [];
-    $subjectTimes = $_POST['subject_time'] ?? [];
-    $subjectDays = $_POST['subject_day'] ?? [];
+    if (isset($_POST['subject_code'])) {
+        $subjectCodes = $_POST['subject_code'] ?? [];
+        $subjectTitles = $_POST['subject_title'] ?? [];
+        $subjectUnits = $_POST['subject_units'] ?? [];
+        $subjectTimes = $_POST['subject_time'] ?? [];
+        $subjectDays = $_POST['subject_day'] ?? [];
 
-    $updatedSubjects = [];
-    for ($i = 0; $i < count($subjectCodes); $i++) {
-        $code = trim($subjectCodes[$i] ?? '');
-        $title = trim($subjectTitles[$i] ?? '');
-        $unit = trim($subjectUnits[$i] ?? '');
-        $time = trim($subjectTimes[$i] ?? '');
-        $day = trim($subjectDays[$i] ?? '');
+        $updatedSubjects = [];
+        for ($i = 0; $i < count($subjectCodes); $i++) {
+            $code = trim($subjectCodes[$i] ?? '');
+            $title = trim($subjectTitles[$i] ?? '');
+            $unit = trim($subjectUnits[$i] ?? '');
+            $time = trim($subjectTimes[$i] ?? '');
+            $day = trim($subjectDays[$i] ?? '');
 
-        if ($code === '' && $title === '') {
-            continue;
+            if ($code === '' && $title === '') {
+                continue;
+            }
+
+            $updatedSubjects[] = [
+                'code' => $code,
+                'title' => $title,
+                'units' => is_numeric($unit) ? (int) $unit : 0,
+                'time' => $time,
+                'day' => $day,
+            ];
         }
 
-        $updatedSubjects[] = [
-            'code' => $code,
-            'title' => $title,
-            'units' => is_numeric($unit) ? (int) $unit : 0,
-            'time' => $time,
-            'day' => $day,
-        ];
-    }
+        $updatedSubjectsJson = null;
+        if (count($updatedSubjects) > 0) {
+            $updatedSubjectsJson = json_encode($updatedSubjects, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
 
-    $updatedSubjectsJson = null;
-    if (count($updatedSubjects) > 0) {
-        $updatedSubjectsJson = json_encode($updatedSubjects, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-    }
-
-    $updateStmt = $conn->prepare("UPDATE students SET matriculation_subjects = ? WHERE token = ?");
-    if ($updateStmt) {
-        $updateStmt->bind_param('ss', $updatedSubjectsJson, $token);
-        $updateStmt->execute();
-        $updateStmt->close();
-        $subjects = $updatedSubjects;
-        $saveMessage = 'Subjects updated successfully.';
+        $updateStmt = $conn->prepare("UPDATE students SET matriculation_subjects = ? WHERE token = ?");
+        if ($updateStmt) {
+            $updateStmt->bind_param('ss', $updatedSubjectsJson, $token);
+            $updateStmt->execute();
+            $updateStmt->close();
+            $subjects = $updatedSubjects;
+            $saveMessage = 'Subjects updated successfully.';
+        }
     }
 }
 
@@ -77,23 +79,23 @@ if (!empty($enrollment['matriculation_subjects']) && empty($saveMessage)) {
 $total_units = array_sum(array_column($subjects, 'units'));
 $registration_date = date('F d, Y', strtotime($enrollment['created_at']));
 $school_name = 'Computer Communication Development Institute';
-$school_address = 'Some Road, Branch, City';
+$school_address = 'Rizal St., Bitan-o, Sorsogon, Philippines';
 $current_semester = '2nd Sem';
 $current_school_year = '2025-2026';
 
 $fees = [
-    'registration' => 5400.00,
-    'tuition' => 3912.00,
-    'lab' => 0.00,
-    'misc' => 0.00,
+    'registration' => '',
+    'tuition' => '',
+    'lab' => '',
+    'misc' => '',
 ];
-$total_fees = array_sum($fees);
+$total_fees = '';
 $payment_schedule = [
     'upon_registration' => 4700.00,
-    'prelim' => 2811.00,
-    'midterm' => 2811.00,
-    'semi_final' => 2811.00,
-    'final' => 1405.80,
+    'prelim' => '',
+    'midterm' => '',
+    'semi_final' => '',
+    'final' => '',
 ];
 ?>
 <!DOCTYPE html>
@@ -135,6 +137,9 @@ $payment_schedule = [
 </head>
 <body>
     <div class="page">
+        <?php if ($saveMessage): ?>
+            <p style="color:green; text-align:center; margin-bottom:20px;"><?php echo htmlspecialchars($saveMessage); ?></p>
+        <?php endif; ?>
         <div class="print-button">
             <button onclick="window.print()">Print Matriculation</button>
             <a href="edit_subjects.php?token=<?php echo urlencode($token); ?>" style="margin-left:12px; display:inline-block; padding:10px 18px; background:#10b981; color:#fff; border-radius:5px; text-decoration:none;">Edit Subjects</a>
@@ -269,11 +274,11 @@ $payment_schedule = [
                 <table class="fees-table">
                     <tbody>
                         <tr><th>Fee</th><th>Amount</th></tr>
-                        <tr><td>Registration</td><td>₱<?php echo number_format($fees['registration'], 2); ?></td></tr>
-                        <tr><td>Tuition</td><td>₱<?php echo number_format($fees['tuition'], 2); ?></td></tr>
-                        <tr><td>Lab</td><td>₱<?php echo number_format($fees['lab'], 2); ?></td></tr>
-                        <tr><td>Miscellaneous</td><td>₱<?php echo number_format($fees['misc'], 2); ?></td></tr>
-                        <tr style="font-weight:bold;"><td>Total Assessment Fee</td><td>₱<?php echo number_format($total_fees, 2); ?></td></tr>
+                        <tr><td>Registration</td><td><?php echo is_numeric($fees['registration']) ? '₱' . number_format($fees['registration'], 2) : '&nbsp;'; ?></td></tr>
+                        <tr><td>Tuition</td><td><?php echo is_numeric($fees['tuition']) ? '₱' . number_format($fees['tuition'], 2) : '&nbsp;'; ?></td></tr>
+                        <tr><td>Lab</td><td><?php echo is_numeric($fees['lab']) ? '₱' . number_format($fees['lab'], 2) : '&nbsp;'; ?></td></tr>
+                        <tr><td>Miscellaneous</td><td><?php echo is_numeric($fees['misc']) ? '₱' . number_format($fees['misc'], 2) : '&nbsp;'; ?></td></tr>
+                        <tr style="font-weight:bold;"><td>Total Assessment Fee</td><td><?php echo is_numeric($total_fees) ? '₱' . number_format($total_fees, 2) : '&nbsp;'; ?></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -283,10 +288,10 @@ $payment_schedule = [
                     <tbody>
                         <tr><th>Due</th><th>Amount</th></tr>
                         <tr><td>Upon Registration</td><td>₱<?php echo number_format($payment_schedule['upon_registration'], 2); ?></td></tr>
-                        <tr><td>Prelim</td><td>₱<?php echo number_format($payment_schedule['prelim'], 2); ?></td></tr>
-                        <tr><td>Midterm</td><td>₱<?php echo number_format($payment_schedule['midterm'], 2); ?></td></tr>
-                        <tr><td>Semi-final</td><td>₱<?php echo number_format($payment_schedule['semi_final'], 2); ?></td></tr>
-                        <tr><td>Final</td><td>₱<?php echo number_format($payment_schedule['final'], 2); ?></td></tr>
+                        <tr><td>Prelim</td><td><?php echo $payment_schedule['prelim'] !== '' ? '₱' . number_format($payment_schedule['prelim'], 2) : '&nbsp;'; ?></td></tr>
+                        <tr><td>Midterm</td><td><?php echo $payment_schedule['midterm'] !== '' ? '₱' . number_format($payment_schedule['midterm'], 2) : '&nbsp;'; ?></td></tr>
+                        <tr><td>Semi-final</td><td><?php echo $payment_schedule['semi_final'] !== '' ? '₱' . number_format($payment_schedule['semi_final'], 2) : '&nbsp;'; ?></td></tr>
+                        <tr><td>Final</td><td><?php echo $payment_schedule['final'] !== '' ? '₱' . number_format($payment_schedule['final'], 2) : '&nbsp;'; ?></td></tr>
                     </tbody>
                 </table>
             </div>
